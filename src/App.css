@@ -1,42 +1,49 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.body{
+
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.Grad-effct{
+  background: rgb(0,3,8);
+  background: linear-gradient(90deg, rgba(0,3,8,1) 0%, rgb(1, 12, 16) 41%, rgba(2,30,27,1) 68%, rgba(0,0,1,1) 100%);
+  background-size: 400% 400%;
+  animation: gradient-animation 30s ease infinite;
 }
 
-@keyframes logo-spin {
+.breath-effct{
+  animation: breathe 4s ease-in-out infinite alternate;
+}
+
+
+
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes breathe {
   from {
-    transform: rotate(0deg);
+    transform: scale(1);
   }
   to {
-    transform: rotate(360deg);
+    transform: scale(1.03);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.cursor-trail {
+  pointer-events: none;
+  position: fixed;
+  height: 2px;
+  background: rgb(206, 109, 4);
+  opacity: 0;
+  z-index: 10000;
+  transition: opacity 0.5s;
+  transform-origin: left center;
 }

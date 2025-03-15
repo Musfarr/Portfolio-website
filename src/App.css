@@ -2,6 +2,14 @@
 
 }
 
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .Grad-effct{
   background: rgb(0,3,8);
   background: linear-gradient(90deg, rgba(0,3,8,1) 0%, rgb(1, 12, 16) 41%, rgba(2,30,27,1) 68%, rgba(0,0,1,1) 100%);
@@ -59,6 +67,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.trail-line {
+  position: fixed;
+  height: 2px;
+  background: rgba(255, 140, 0, 0.8);
+  pointer-events: none;
+  z-index: 10000;
+  transform-origin: left center;
+  box-shadow: 0 0 8px rgba(255, 140, 0, 0.6);
+}
+
 @keyframes gradient-animation {
   0% {
     background-position: 0% 50%;
@@ -78,15 +96,4 @@
   to {
     transform: scale(1.03);
   }
-}
-
-.cursor-trail {
-  pointer-events: none;
-  position: fixed;
-  height: 2px;
-  background: rgb(206, 109, 4);
-  opacity: 0;
-  z-index: 10000;
-  transition: opacity 0.5s;
-  transform-origin: left center;
 }

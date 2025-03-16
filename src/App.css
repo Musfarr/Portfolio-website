@@ -1,87 +1,26 @@
-.body{
-
-}
-
 html, body {
-  overflow: hidden;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   height: 100%;
   width: 100%;
 }
 
-.Grad-effct{
+.App {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.Grad-effct {
+  position: relative;
   background: rgb(0,3,8);
   background: linear-gradient(90deg, rgba(0,3,8,1) 0%, rgb(1, 12, 16) 41%, rgba(2,30,27,1) 68%, rgba(0,0,1,1) 100%);
   background-size: 400% 400%;
-  animation: gradient-animation 30s ease infinite;
+  animation: gradient 15s ease infinite;
 }
 
-.breath-effct{
-  animation: breathe 4s ease-in-out infinite alternate;
-}
-
-.sidebar{
- background: rgb(1 12 16) 
-}
-
-.Btn {
-  position: relative;
-  padding: 0.7rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(45deg, #0b111a, #0d0d20);
-  border: 2px solid rgba(3, 9, 39, 0.1);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  z-index: 1;
-}
-
-.Btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  transition: left 0.75s ease;
-  z-index: -1;
-}
-
-.Btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.Btn:hover::before {
-  left: 100%;
-}
-
-.Btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.trail-line {
-  position: fixed;
-  height: 2px;
-  background: rgba(255, 140, 0, 0.8);
-  pointer-events: none;
-  z-index: 10000;
-  transform-origin: left center;
-  box-shadow: 0 0 8px rgba(255, 140, 0, 0.6);
-}
-
-@keyframes gradient-animation {
+@keyframes gradient {
   0% {
     background-position: 0% 50%;
   }
@@ -93,11 +32,84 @@ html, body {
   }
 }
 
+.breath-effct {
+  animation: breathe 6s ease-in-out infinite;
+}
+
 @keyframes breathe {
-  from {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
     transform: scale(1);
   }
-  to {
-    transform: scale(1.03);
+  100% {
+    transform: scale(0.95);
   }
+}
+
+.Btn {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  color: #ff9900;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: 0.5s ease-in-out;
+  letter-spacing: 4px;
+  border: 1px solid #ff9900;
+  background: transparent;
+}
+
+.Btn:hover {
+  transition: 0.9s ease-in-out;
+  background: #ff9900;
+  color: #000;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #ff9900, 0 0 25px #ff9900, 0 0 50px #ff9900, 0 0 80px #ff9900;
+}
+
+.trail-line {
+  position: absolute;
+  height: 2px;
+  background-color: #ff9900;
+  pointer-events: none;
+  transform-origin: left center;
+  z-index: 9999;
+  box-shadow: 0 0 6px #ff9900, 0 0 10px #ff9900;
+}
+
+/* Page transition styles */
+.page-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.sidebar{
+ background: rgb(1 12 16) 
+}
+
+.sidebar, .body, .body, .Grad-effct, .breath-effct, .Btn, .trail-line {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.page-transition-enter {
+  opacity: 0;
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+}
+
+.page-transition-leave {
+  opacity: 1;
+}
+
+.page-transition-leave-active {
+  opacity: 0;
 }

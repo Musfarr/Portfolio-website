@@ -1,116 +1,149 @@
-import { useState } from 'react'
-import './index.css'
-import './App.css'
-import SideBar from './pages/SideBar'
-import Home from './pages/Home'
-import Navbar from './pages/Navbar'
-import gsap from 'gsap'
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import './App.css';
+import Navbar from './pages/Navbar';
+import SideBar from './pages/SideBar';
+import Home from './pages/Home';
+import About from './pages/About';
+import Projects from './pages/Projects';
 
-function App() {
-  const [count, setCount] = useState(0)
+// AnimatePresence requires the use of a location
+function AnimatedRoutes() {
+  const location = useLocation();
   
-  useEffect(() => {
-    let prevX = 0;
-    let prevY = 0;
-    let isFirstMove = true;
-    const maxLines = 20;
-    let lines = [];
-    
-    const createLine = (x1, y1, x2, y2) => {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      
-      // Create line element
-      const line = document.createElement("div");
-      line.className = "trail-line";
-      line.style.left = `${x1}px`;
-      line.style.top = `${y1}px`;
-      line.style.width = "0px";
-      line.style.transform = `rotate(${angle}deg)`;
-      document.body.appendChild(line);
-      
-      // Animate the line
-      gsap.fromTo(line, 
-        { 
-          width: 0,
-          opacity: 0.8
-        },
-        {
-          width: distance,
-          opacity: 0,
-          duration: 1,
-          ease: "power1.out",
-          onComplete: () => {
-            if (document.body.contains(line)) {
-              document.body.removeChild(line);
-            }
-          }
-        }
-      );
-      
-      return line;
-    };
-    
-    const onMouseMove = (e) => {
-      const x = e.clientX;
-      const y = e.clientY;
-      
-      if (isFirstMove) {
-        prevX = x;
-        prevY = y;
-        isFirstMove = false;
-        return;
-      }
-      
-      // Only create a line if the mouse has moved a minimum distance
-      const dx = x - prevX;
-      const dy = y - prevY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance > 5) {
-        // Create new line
-        const line = createLine(prevX, prevY, x, y);
-        lines.push(line);
-        
-        // Remove excess lines
-        if (lines.length > maxLines) {
-          const oldLine = lines.shift();
-          gsap.killTweensOf(oldLine);
-          if (document.body.contains(oldLine)) {
-            document.body.removeChild(oldLine);
-          }
-        }
-        
-        prevX = x;
-        prevY = y;
-      }
-    };
-    
-    document.addEventListener("mousemove", onMouseMove);
-    
-    return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      // Clean up any remaining lines
-      lines.forEach(line => {
-        gsap.killTweensOf(line);
-        if (document.body.contains(line)) {
-          document.body.removeChild(line);
-        }
-      });
-    };
-  }, []);
-
   return (
-    <>
-    {/* <Navbar/> */}
-    <SideBar/>
-    <Home/>
-     
-    </>
-  )
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/projects" element={<Projects />} />
+      </Routes>
+    </AnimatePresence>
+  );
 }
 
-export default App
+function App() {
+  const [prevMouseX, setPrevMouseX] = useState(0);
+  const [prevMouseY, setPrevMouseY] = useState(0);
+  const lineRefs = useRef([]);
+  const maxLines = 20;
+
+  // Function to create a line between two points
+  const createLine = (x1, y1, x2, y2) => {
+    const line = document.createElement("div");
+    line.className = "trail-line";
+    line.style.left = `${x1}px`;
+    line.style.top = `${y1}px`;
+    document.body.appendChild(line);
+    
+    // Calculate the angle and distance
+    const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+    const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    
+    // Store line reference for cleanup
+    lineRefs.current.push(line);
+    
+    // Remove oldest line if we exceed the max number
+    if (lineRefs.current.length > maxLines) {
+      const oldestLine = lineRefs.current.shift();
+      if (oldestLine && oldestLine.parentNode) {
+        oldestLine.parentNode.removeChild(oldestLine);
+      }
+    }
+    
+    // Animate the line using GSAP
+    gsap.set(line, {
+      width: 0,
+      height: 2,
+      rotation: angle,
+      transformOrigin: "left center"
+    });
+    
+    gsap.to(line, {
+      width: distance,
+      duration: 0.3,
+      ease: "power1.out"
+    });
+    
+    gsap.to(line, {
+      opacity: 0,
+      duration: 0.8,
+      delay: 0.2,
+      onComplete: () => {
+        if (line.parentNode) {
+          line.parentNode.removeChild(line);
+          // Remove from refs array
+          const index = lineRefs.current.indexOf(line);
+          if (index > -1) {
+            lineRefs.current.splice(index, 1);
+          }
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    let lastCallTime = 0;
+    const throttleInterval = 30; // milliseconds
+    const movementThreshold = 5; // minimum pixel movement to create a line
+    
+    const handleMouseMove = (e) => {
+      const currentTime = Date.now();
+      
+      // Throttle line creation
+      if (currentTime - lastCallTime < throttleInterval) return;
+      
+      // Calculate movement distance
+      const distanceMoved = Math.sqrt(
+        Math.pow(e.clientX - prevMouseX, 2) + 
+        Math.pow(e.clientY - prevMouseY, 2)
+      );
+      
+      // Only create a line if movement exceeds threshold
+      if (distanceMoved > movementThreshold) {
+        createLine(prevMouseX, prevMouseY, e.clientX, e.clientY);
+        setPrevMouseX(e.clientX);
+        setPrevMouseY(e.clientY);
+        lastCallTime = currentTime;
+      }
+    };
+    
+    // Initial mouse position
+    const initMousePosition = (e) => {
+      setPrevMouseX(e.clientX);
+      setPrevMouseY(e.clientY);
+      document.removeEventListener('mousemove', initMousePosition);
+      document.addEventListener('mousemove', handleMouseMove);
+    };
+    
+    document.addEventListener('mousemove', initMousePosition);
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('mousemove', initMousePosition);
+      document.removeEventListener('mousemove', handleMouseMove);
+      
+      // Remove all lines from DOM
+      lineRefs.current.forEach(line => {
+        if (line && line.parentNode) {
+          line.parentNode.removeChild(line);
+        }
+      });
+      lineRefs.current = [];
+    };
+  }, [prevMouseX, prevMouseY]);
+
+  return (
+    <BrowserRouter>
+      <div className="App Grad-effct">
+        <Navbar />
+        <SideBar />
+        <AnimatedRoutes />
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;

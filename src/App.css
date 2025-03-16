@@ -21,9 +21,13 @@ html, body {
   animation: breathe 4s ease-in-out infinite alternate;
 }
 
+.sidebar{
+ background: rgb(1 12 16) 
+}
+
 .Btn {
   position: relative;
-  padding: 1rem;
+  padding: 0.7rem;
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;

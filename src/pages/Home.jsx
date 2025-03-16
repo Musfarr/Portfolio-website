@@ -7,7 +7,7 @@ const Home = () => {
     <div className='breath-effct'>
       <p className='text-gray-300 text-5xl mb-4 font-bold '>Syed Musfer </p>
       <h1 className='text-gray-300 text-2xl  '>Full Stack Software Engineer </h1>
-    <button className='Btn mt-4'> Download Resume</button>
+    <button className='Btn mt-4'> <a href="./Musfer_CV.pdf" download>Download Resume</a></button>
     </div>
     
 
